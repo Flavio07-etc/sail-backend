@@ -2,37 +2,40 @@ package com.faculdade.sail.controller;
 
 import com.faculdade.sail.model.Usuario;
 import com.faculdade.sail.service.UsuarioService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.faculdade.sail.service.TokenService;
+import com.faculdade.sail.dtos.CadastroUsuarioEntrada;
+import com.faculdade.sail.dtos.LoginEntrada;
+import com.faculdade.sail.dtos.LoginResposta;
+import com.faculdade.sail.dtos.UsuarioResposta;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/usuarios")
-@CrossOrigin("*") 
 public class UsuarioController {
 
-    @Autowired
-    private UsuarioService service;
+    private final UsuarioService service;
+    private final TokenService tokenService;
+
+    public UsuarioController(UsuarioService service, TokenService tokenService) {
+        this.service = service;
+        this.tokenService = tokenService;
+    }
 
     
     @PostMapping("/cadastrar")
-    public ResponseEntity<?> cadastrar(@RequestBody Usuario usuario) {
-        try {
-            Usuario novoUsuario = service.cadastrar(usuario);
-            return ResponseEntity.ok(novoUsuario);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<UsuarioResposta> cadastrar(@Valid @RequestBody CadastroUsuarioEntrada entrada) {
+        Usuario usuario = new Usuario();
+        usuario.setNome(entrada.nome());
+        usuario.setEmail(entrada.email());
+        usuario.setSenha(entrada.senha());
+        return ResponseEntity.ok(UsuarioResposta.de(service.cadastrar(usuario)));
     }
 
     
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Usuario loginData) {
-        try {
-            Usuario usuarioLogado = service.fazerLogin(loginData.getEmail(), loginData.getSenha());
-            return ResponseEntity.ok(usuarioLogado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<LoginResposta> login(@Valid @RequestBody LoginEntrada entrada) {
+        return ResponseEntity.ok(tokenService.criarSessao(service.fazerLogin(entrada.email(), entrada.senha())));
     }
 }

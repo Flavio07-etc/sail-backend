@@ -21,6 +21,10 @@ public class Produto {
     @Column(nullable = false)
     private Double preco;
 
+    @JsonIgnore
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean ativo = true;
+
     @ManyToOne
     @JoinColumn(name = "created_by")
     private Usuario criadoPor;
@@ -30,7 +34,7 @@ public class Produto {
     private Usuario atualizadoPor;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "produto")
     private List<Registro> registros;
 
     public Produto() {
@@ -47,6 +51,9 @@ public class Produto {
 
     public Double getPreco() { return preco; }
     public void setPreco(Double preco) { this.preco = preco; }
+
+    public boolean isAtivo() { return ativo; }
+    public void setAtivo(boolean ativo) { this.ativo = ativo; }
 
     public Usuario getCriadoPor() { return criadoPor; }
     public void setCriadoPor(Usuario criadoPor) { this.criadoPor = criadoPor; }

@@ -4,9 +4,10 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "registros")
+@Table(name = "registros", uniqueConstraints = @UniqueConstraint(name = "uk_registro_usuario_chave", columnNames = {"usuario_id", "chave_operacao"}))
 public class Registro {
 
     @Id
@@ -32,15 +33,18 @@ public class Registro {
 
     private String acao;
 
+    @JsonIgnore
+    @Column(length = 100)
+    private String chaveOperacao;
+
+    @JsonIgnore
+    @Column(length = 64)
+    private String assinaturaOperacao;
+
     public Registro() {}
 
     public Registro(Produto produto, Integer quantidade, BigDecimal valorTotal, Usuario usuario) {
-        this.produto = produto;
-        this.quantidade = quantidade;
-        this.valorTotal = valorTotal;
-        this.usuario = usuario;
-        this.dataVenda = LocalDateTime.now();
-        this.acao = "VENDA";
+        this(produto, quantidade, valorTotal, usuario, "VENDA");
     }
 
     public Registro(Produto produto, Integer quantidade, BigDecimal valorTotal, Usuario usuario, String acao) {
@@ -73,4 +77,9 @@ public class Registro {
 
     public String getAcao() { return acao; }
     public void setAcao(String acao) { this.acao = acao; }
+
+    public String getChaveOperacao() { return chaveOperacao; }
+    public void setChaveOperacao(String chaveOperacao) { this.chaveOperacao = chaveOperacao; }
+    public String getAssinaturaOperacao() { return assinaturaOperacao; }
+    public void setAssinaturaOperacao(String assinaturaOperacao) { this.assinaturaOperacao = assinaturaOperacao; }
 }

@@ -11,5 +11,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     
     
     Optional<Usuario> findByEmail(String email);
-    Optional<Usuario> findByEmailAndSenha(String email, String senha);
+    Optional<Usuario> findByEmailIgnoreCase(String email);
+
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("SELECT u FROM Usuario u WHERE u.id = :id")
+    Optional<Usuario> buscarParaOperacao(@org.springframework.data.repository.query.Param("id") Long id);
 }

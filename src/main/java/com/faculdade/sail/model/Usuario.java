@@ -1,6 +1,8 @@
 package com.faculdade.sail.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "usuarios")
@@ -18,7 +20,12 @@ public class Usuario {
     private String email;
 
     @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;
+
+    @JsonIgnore
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean senhaCodificada;
 
     public Usuario() {
     }
@@ -35,4 +42,7 @@ public class Usuario {
 
     public String getSenha() { return senha; }
     public void setSenha(String senha) { this.senha = senha; }
+
+    public boolean isSenhaCodificada() { return senhaCodificada; }
+    public void setSenhaCodificada(boolean senhaCodificada) { this.senhaCodificada = senhaCodificada; }
 }
