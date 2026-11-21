@@ -21,6 +21,9 @@ public class Produto {
     @Column(nullable = false)
     private Double preco;
 
+    @Column(columnDefinition = "LONGTEXT")
+    private String imagem;
+
     @JsonIgnore
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean ativo = true;
@@ -51,6 +54,9 @@ public class Produto {
 
     public Double getPreco() { return preco; }
     public void setPreco(Double preco) { this.preco = preco; }
+
+    public String getImagem() { return imagem; }
+    public void setImagem(String imagem) { this.imagem = imagem; }
 
     public boolean isAtivo() { return ativo; }
     public void setAtivo(boolean ativo) { this.ativo = ativo; }

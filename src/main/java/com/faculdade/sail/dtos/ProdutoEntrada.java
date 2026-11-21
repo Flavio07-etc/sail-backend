@@ -29,6 +29,7 @@ public record ProdutoEntrada(
         produto.setNome(nome.strip());
         produto.setQuantidade(quantidade.intValueExact());
         produto.setPreco(preco.doubleValue());
+        produto.setImagem(imagem == null || imagem.isBlank() ? null : imagem);
         return produto;
     }
 }
