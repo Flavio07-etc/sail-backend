@@ -43,7 +43,8 @@ public class ProdutoService {
         validarChave(chave);
         Usuario usuario = obterResponsavel(usuarioId);
         String assinatura = VersaoProduto.assinatura("CADASTRO:" + produto.getNome().length() + ":" + produto.getNome()
-                + ":" + produto.getQuantidade() + ":" + produto.getPreco());
+        + ":" + produto.getQuantidade() + ":" + produto.getPreco()
+        + ":" + (produto.getImagem() == null ? 0 : produto.getImagem().hashCode()));
         Produto repetido = obterOperacaoAnterior(usuarioId, chave, assinatura);
         if (repetido != null) {
             return repetido;
@@ -96,14 +97,18 @@ public class ProdutoService {
             throw ApiException.conflito("O saldo atual exige um ajuste específico antes desta alteração.");
         }
         int diferenca = (int) variacao;
+            boolean imagemNova = dados.getImagem() != null && !dados.getImagem().equals(produto.getImagem());
         boolean alterado = diferenca != 0 || !Objects.equals(produto.getNome(), dados.getNome())
-                || !Objects.equals(produto.getPreco(), dados.getPreco());
+                || !Objects.equals(produto.getPreco(), dados.getPreco()) || imagemNova;
         if (!alterado) {
             return produto;
         }
         produto.setNome(dados.getNome());
         produto.setQuantidade(dados.getQuantidade());
         produto.setPreco(dados.getPreco());
+        if (imagemNova) {
+            produto.setImagem(dados.getImagem());
+        }
         produto.setAtualizadoPor(usuario);
         Produto salvo = repository.save(produto);
         registrar(salvo, diferenca, BigDecimal.ZERO, usuario, diferenca == 0 ? "EDICAO" : "AJUSTE", null, null);
@@ -171,6 +176,10 @@ public class ProdutoService {
         Double preco = produto.getPreco();
         if (!precoValido(preco)) {
             throw ApiException.invalida("Informe um preço válido, não negativo e com até duas casas decimais.");
+        }
+        String imagem = produto.getImagem();
+        if (imagem != null && (!imagem.startsWith("data:image/") || imagem.length() > 1_500_000)) {
+            throw ApiException.invalida("A foto do produto é inválida ou grande demais.");
         }
         produto.setNome(produto.getNome().strip());
     }
